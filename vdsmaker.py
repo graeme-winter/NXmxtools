@@ -38,7 +38,8 @@ def split_big_data(nxs_in, n):
         end = bs * (j + 1)
         chunk = nn[start:end]
 
-        nxs_out = nxs_in.replace(".nxs", "_%d.nxs" % j)
+        nxs_out = nxs_in.replace(".nxs", "_%d.nxs" % (j + 1))
+        print("%s: %d -> %d" % (nxs_out, start, end))
         shutil.copyfile(nxs_in, nxs_out)
 
         with h5py.File(nxs_out, "r+") as f:
