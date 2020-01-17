@@ -9,6 +9,7 @@ def split_big_data(nxs_in, n):
     # first interrogate the full data set to get the complete info
     subfile_size = {}
     omega = None
+    underlying_dtype = None
 
     with h5py.File(nxs_in, "r") as f:
         omega = f["/entry/data/omega"][()]
@@ -16,6 +17,8 @@ def split_big_data(nxs_in, n):
             if k.startswith("data_"):
                 subfilename = f["/entry/data"][k].file.filename
                 shape = f["/entry/data"][k].shape
+                if underlying_dtype is None:
+                    underlying_dtype = f["/entry/data"][k].dtype
                 subfile_size[subfilename] = shape
 
     blocks = [subfile_size[s][0] for s in subfile_size]
@@ -49,7 +52,7 @@ def split_big_data(nxs_in, n):
             # data block boundaries in the general case
 
             vds = h5py.VirtualLayout(
-                shape=(end - start,) + shape[1:], dtype=numpy.int64
+                shape=(end - start,) + shape[1:], dtype=underlying_dtype
             )
 
             # now work out
