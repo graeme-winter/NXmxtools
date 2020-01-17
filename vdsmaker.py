@@ -33,12 +33,14 @@ def split_big_data(nxs_in, n):
 
     # figure out which data sets consist of which blocks of data
 
+    fmt = "%%0%dd" % len(str(n))
+    
     for j in range(n):
         start = bs * j
         end = bs * (j + 1)
         chunk = nn[start:end]
 
-        nxs_out = nxs_in.replace(".nxs", "_%d.nxs" % (j + 1))
+        nxs_out = nxs_in.replace(".nxs", "_%s.nxs" % (fmt % (j + 1)))
         print("%s: %d -> %d" % (nxs_out, start, end))
         shutil.copyfile(nxs_in, nxs_out)
 
