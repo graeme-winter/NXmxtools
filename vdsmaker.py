@@ -21,7 +21,7 @@ def split_big_data(nxs_in, n):
                     underlying_dtype = f["/entry/data"][k].dtype
                 subfile_size[subfilename] = shape
 
-    blocks = [subfile_size[s][0] for s in subfile_size]
+    blocks = [subfile_size[s][0] for s in sorted(subfile_size)]
     nn = sum(([(i, j) for i in range(n)] for j, n in enumerate(blocks)), [])
     nframes = len(nn)
 
@@ -73,8 +73,9 @@ def split_big_data(nxs_in, n):
                 vds[last : last + (block_end - block_start), :, :] = data
                 last += block_end - block_start
 
-            # delete the data entry
-            del f["/entry/data/data"]
+            # delete the data entry - if necessary
+            if "/entry/data/data" in f:
+                del f["/entry/data/data"]
 
             # replace with the VDS
             f.create_virtual_dataset("/entry/data/data", vds, fillvalue=-1)
