@@ -13,6 +13,8 @@ def split_big_data(nxs_in, n):
 
     with h5py.File(nxs_in, "r") as f:
         omega = f["/entry/data/omega"][()]
+        omega_end = f["/entry/sample/transformations/omega_end"][()]
+        omega_increment_set = f["/entry/sample/transformations/omega_increment_set"][()]
         for k in f["/entry/data"]:
             if k.startswith("data_"):
                 subfilename = f["/entry/data"][k].file.filename
@@ -34,7 +36,7 @@ def split_big_data(nxs_in, n):
     # figure out which data sets consist of which blocks of data
 
     fmt = "%%0%dd" % len(str(n))
-    
+
     for j in range(n):
         start = bs * j
         end = bs * (j + 1)
@@ -47,6 +49,13 @@ def split_big_data(nxs_in, n):
         with h5py.File(nxs_out, "r+") as f:
             f["/entry/data/omega"].resize([end - start])
             f["/entry/data/omega"][...] = omega[start:end]
+            f["/entry/sample/transformations/omega_end"].resize([end - start])
+            f["/entry/sample/transformations/omega_end"][...] = omega_end[start:end]
+            f["/entry/sample/transformations/omega_increment_set"].resize([end - start])
+            f["/entry/sample/transformations/omega_increment_set"][
+                ...
+            ] = omega_increment_set[start:end]
+
             for k in f["/entry/data"]:
                 if k.startswith("data_"):
                     del f["/entry/data"][k]
